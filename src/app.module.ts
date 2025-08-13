@@ -13,7 +13,9 @@ import { AuthController } from './auth/auth.controller';
         ConfigModule.forRoot({
             isGlobal: true,
         }),
-        MongooseModule.forRoot(process.env.MONGO_DB_URL ?? ''),
+        MongooseModule.forRoot(process.env.MONGO_DB_URL ?? '', {
+            dbName: 'simple-app-db',
+        }),
         JwtModule.register({
             global: true,
             secret: process.env.JWT_SECRET,
