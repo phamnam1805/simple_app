@@ -3,6 +3,9 @@ import { getModelToken } from '@nestjs/mongoose';
 import { UsersService } from './users.service';
 import { User } from './user.schema';
 
+// Import Jest types for TypeScript
+import 'jest';
+
 describe('UsersService', () => {
     let service: UsersService;
 
