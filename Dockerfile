@@ -27,7 +27,7 @@ RUN npm run build
 # Set NODE_ENV environment variable
 ENV NODE_ENV=production
 
-# Running `npm ci` removes the existing node_modules directory and pASsing in --only=production ensures that only the production dependencies are installed. This ensures that the node_modules directory is AS optimized AS possible
+# Running `npm ci` removes the existing node_modules directory and passing in --only=production ensures that only the production dependencies are installed. This ensures that the node_modules directory is as optimized as possible
 RUN npm ci --only=production && npm cache clean --force
 
 USER node
@@ -44,7 +44,10 @@ WORKDIR /app
 COPY --chown=node:node --from=build /app/node_modules ./node_modules
 COPY --chown=node:node --from=build /app/dist ./dist
 
-RUN mkdir -p /app/assets/videos
+# Create videos directory and set ownership BEFORE switching to node user
+RUN mkdir -p /app/assets/videos && chown -R node:node /app/assets/videos
+
+USER node
 
 # Start the server using the production build
 CMD [ "node", "dist/main.js" ]
