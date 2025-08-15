@@ -18,7 +18,7 @@ RUN npm run build
 FROM node:20-alpine AS prod-deps
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 # 4) Final runtime image
 FROM node:20-alpine AS runner
