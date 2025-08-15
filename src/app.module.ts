@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AuthService } from './auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth/auth.controller';
+import { VideosModule } from './videos/videos.module';
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { AuthController } from './auth/auth.controller';
             signOptions: { expiresIn: '100d' },
         }),
         UsersModule,
+        VideosModule,
     ],
     controllers: [AppController, AuthController],
     providers: [AppService, AuthService],

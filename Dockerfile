@@ -23,6 +23,7 @@ RUN npm ci --omit=dev
 # 4) Final runtime image
 FROM node:20-alpine AS runner
 WORKDIR /app
+RUN mkdir -p /app/assets/videos
 ENV NODE_ENV=production
 
 # Copy production node_modules and built artifacts
