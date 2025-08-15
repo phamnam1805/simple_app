@@ -10,6 +10,9 @@ export class Video {
 
     @Prop({ required: true })
     extension: string;
+
+    @Prop({ required: true })
+    originalFileName: string;
 }
 
 export const VideoSchema = SchemaFactory.createForClass(Video);

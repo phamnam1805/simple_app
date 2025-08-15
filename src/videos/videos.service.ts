@@ -36,6 +36,7 @@ export class VideosService {
             const video = new this.videoModel({
                 id: videoId,
                 extension: extension,
+                originalFileName: file.originalname,
             });
             const savedVideo = await video.save();
             return savedVideo;
