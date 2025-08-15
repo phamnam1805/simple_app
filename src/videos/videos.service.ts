@@ -6,8 +6,9 @@ import path from 'path';
 import * as crypto from 'crypto';
 import * as fs from 'fs/promises';
 import { VIDEO_ASSET_PATH } from './videos.constants';
-import { Request, Response } from 'express';
+import { Request, Response, Express } from 'express';
 import { createReadStream } from 'fs';
+import 'multer';
 
 @Injectable()
 export class VideosService {
@@ -15,9 +16,9 @@ export class VideosService {
 
     async uploadVideo(file: Express.Multer.File) {
         try {
-            const fileName = path.parse(file.originalname as string).name;
+            const fileName = path.parse(file.originalname).name;
             const extension = path
-                .parse(file.originalname as string)
+                .parse(file.originalname)
                 .ext.replace('.', '');
             const timestamp = Date.now().toString();
             const videoId = crypto

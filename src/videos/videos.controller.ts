@@ -13,7 +13,8 @@ import {
 import { VideosService } from './videos.service';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import type { Request, Response } from 'express';
+import type { Request, Response, Express } from 'express';
+import 'multer';
 
 @Controller('videos')
 export class VideosController {

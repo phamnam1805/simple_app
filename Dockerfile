@@ -1,39 +1,46 @@
-## Multi-stage Dockerfile for NestJS (build + production runtime)
-# Uses Node 20 Alpine for small images
+FROM node:20-alpine AS development
 
-# 1) Install all dependencies (including dev) for building
-FROM node:20-alpine AS deps
 WORKDIR /app
-COPY package*.json ./
+
+COPY --chown=node:node package*.json ./
+
 RUN npm ci
 
-# 2) Build the NestJS app
-FROM node:20-alpine AS builder
+COPY --chown=node:node . .
+
+USER node
+
+FROM node:20-alpine AS build
+
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+
+COPY --chown=node:node package*.json ./
+
+# In order to run `npm run build` we need access to the Nest CLI which is a dev dependency. In the previous development stage we ran `npm ci` which installed all dependencies, so we can copy over the node_modules directory from the development image
+COPY --chown=node:node --from=development /app/node_modules ./node_modules
+
+COPY --chown=node:node . .
+
+# Run the build command which creates the production bundle
 RUN npm run build
 
-# 3) Install only production dependencies for a lean runtime
-FROM node:20-alpine AS prod-deps
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-
-# 4) Final runtime image
-FROM node:20-alpine AS runner
-WORKDIR /app
-RUN mkdir -p /app/assets/videos
+# Set NODE_ENV environment variable
 ENV NODE_ENV=production
 
-# Copy production node_modules and built artifacts
-COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY package*.json ./
+# Running `npm ci` removes the existing node_modules directory and pASsing in --only=production ensures that only the production dependencies are installed. This ensures that the node_modules directory is AS optimized AS possible
+RUN npm ci --only=production && npm cache clean --force
 
-# Expose the port your Nest app listens on (main.ts uses PORT or 3000)
-EXPOSE 3000
+USER node
 
-# Start the server
-CMD ["node", "dist/main.js"]
+###################
+# PRODUCTION
+###################
 
+FROM node:20-alpine AS production
+
+# Copy the bundled code from the build stage to the production image
+COPY --chown=node:node --from=build /app/node_modules ./node_modules
+COPY --chown=node:node --from=build /app/dist ./dist
+
+# Start the server using the production build
+CMD [ "node", "dist/main.js" ]
